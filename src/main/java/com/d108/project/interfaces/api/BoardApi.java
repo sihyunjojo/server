@@ -2,6 +2,7 @@ package com.d108.project.interfaces.api;
 
 
 import com.d108.project.domain.board.dto.BoardCreateDto;
+import com.d108.project.domain.board.dto.BoardDetailResponseDto;
 import com.d108.project.domain.board.dto.BoardResponseDto;
 import com.d108.project.domain.board.dto.BoardUpdateDto;
 import com.d108.project.domain.comment.dto.CommentCreateDto;
@@ -14,7 +15,7 @@ public interface BoardApi {
     @GetMapping
     ResponseEntity<List<BoardResponseDto>> getBoards();
     @GetMapping("/{boardId}")
-    ResponseEntity<BoardResponseDto> getBoardById(@PathVariable Long boardId);
+    ResponseEntity<BoardDetailResponseDto> getBoardById(@PathVariable Long boardId);
     @PostMapping
     ResponseEntity<String> createBoard(@RequestBody BoardCreateDto boardCreateDto);
     @PutMapping("/{boardId}")

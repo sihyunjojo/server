@@ -3,6 +3,7 @@ package com.d108.project.interfaces.controllers;
 import com.d108.project.domain.board.Board;
 import com.d108.project.domain.board.BoardService;
 import com.d108.project.domain.board.dto.BoardCreateDto;
+import com.d108.project.domain.board.dto.BoardDetailResponseDto;
 import com.d108.project.domain.board.dto.BoardResponseDto;
 import com.d108.project.domain.board.dto.BoardUpdateDto;
 import com.d108.project.domain.comment.CommentService;
@@ -34,9 +35,9 @@ public class BoardController implements BoardApi {
     }
 
     @Override
-    public ResponseEntity<BoardResponseDto> getBoardById(@PathVariable Long boardId) {
-        BoardResponseDto boardResponseDto = boardService.getBoardById(boardId);
-        return ResponseEntity.ok(boardResponseDto);
+    public ResponseEntity<BoardDetailResponseDto> getBoardById(@PathVariable Long boardId) {
+        BoardDetailResponseDto boardDetailResponseDto = boardService.getBoardById(boardId);
+        return ResponseEntity.ok(boardDetailResponseDto);
     }
 
     @Override

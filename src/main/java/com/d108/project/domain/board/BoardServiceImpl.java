@@ -63,16 +63,7 @@ public class BoardServiceImpl implements BoardService {
                 .map(this::convertCommentToDto)
                 .collect(Collectors.toList());
 
-        return BoardDetailResponseDto.builder()
-                .id(board.getId())
-                .title(board.getTitle())
-                .description(board.getDescription())
-                .view(board.getView())
-                .comments(commentDtos)
-                .userId(board.getUser().getUserId())
-                .createdAt(board.getCreatedAt())
-                .updatedAt(board.getUpdatedAt())
-                .build();
+        return convertBoardDetailToDto(commentDtos, board);
     }
 
     // 글 수정
@@ -94,8 +85,19 @@ public class BoardServiceImpl implements BoardService {
         boardRepository.deleteById(boardId);
     }
 
-
     // Entity -> DTO 변환
+    private BoardDetailResponseDto convertBoardDetailToDto(List<CommentResponseDto> commentDtos, Board board) {
+        return BoardDetailResponseDto.builder()
+                .id(board.getId())
+                .title(board.getTitle())
+                .description(board.getDescription())
+                .view(board.getView())
+                .comments(commentDtos)
+                .userId(board.getUser().getUserId())
+                .createdAt(board.getCreatedAt())
+                .updatedAt(board.getUpdatedAt())
+                .build();
+    }
     private BoardResponseDto convertBoardToDto(Board board) {
         return BoardResponseDto.builder()
                 .id(board.getId())
@@ -103,12 +105,11 @@ public class BoardServiceImpl implements BoardService {
                 .description(board.getDescription())
                 .commentsCount(board.getComments().size())
                 .view(board.getView())
-                .userId(board.getUser().getUserId())        // 여기서 유저의 정보를 같이 가져오면 되지 않나? (여기서 getUser().getUsername()을 하면 유저 네임이 DTO에 담김)
+                .userId(board.getUser().getUserId())
                 .createdAt(board.getCreatedAt())
                 .updatedAt(board.getUpdatedAt())
                 .build();
     }
-
     private CommentResponseDto convertCommentToDto(Comment comment) {
         return CommentResponseDto.builder()
                 .id(comment.getId())
