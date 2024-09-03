@@ -2,8 +2,11 @@ package com.d108.project.domain.board;
 
 
 import com.d108.project.domain.board.dto.BoardCreateDto;
+import com.d108.project.domain.board.dto.BoardDetailResponseDto;
 import com.d108.project.domain.board.dto.BoardResponseDto;
 import com.d108.project.domain.board.dto.BoardUpdateDto;
+import com.d108.project.domain.comment.Comment;
+import com.d108.project.domain.comment.dto.CommentResponseDto;
 import com.d108.project.domain.user.User;
 import com.d108.project.domain.user.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +29,7 @@ public class BoardServiceImpl implements BoardService {
 
     // 글 작성
     @Override
-    public Board createBoard(BoardCreateDto boardCreateDto) {
+    public void createBoard(BoardCreateDto boardCreateDto) {
         User user = userRepository.findById(boardCreateDto.getUserId())
                 .orElseThrow(() -> new IllegalArgumentException("아이디 오류"));
 
@@ -37,7 +40,7 @@ public class BoardServiceImpl implements BoardService {
                 .view(0L)
                 .build();
 
-        return boardRepository.save(board);
+        boardRepository.save(board);
     }
 
     // 전체 글 조회
@@ -46,17 +49,30 @@ public class BoardServiceImpl implements BoardService {
         List<Board> boards = boardRepository.findAll();
 
         return boards.stream()
-                .map(this::convertToDto)
+                .map(this::convertBoardToDto)
                 .collect(Collectors.toList());
     }
 
     // 특정 글 조회
     @Override
-    public BoardResponseDto getBoardById(Long boardId) {
+    public BoardDetailResponseDto getBoardById(Long boardId) {
         Board board = boardRepository.findById(boardId)
                 .orElseThrow(() -> new RuntimeException("게시글 번호를 찾을 수 없음"));
 
-        return convertToDto(board);
+        List<CommentResponseDto> commentDtos = board.getComments().stream()
+                .map(this::convertCommentToDto)
+                .collect(Collectors.toList());
+
+        return BoardDetailResponseDto.builder()
+                .id(board.getId())
+                .title(board.getTitle())
+                .description(board.getDescription())
+                .view(board.getView())
+                .comments(commentDtos)
+                .userId(board.getUser().getUserId())
+                .createdAt(board.getCreatedAt())
+                .updatedAt(board.getUpdatedAt())
+                .build();
     }
 
     // 글 수정
@@ -80,15 +96,25 @@ public class BoardServiceImpl implements BoardService {
 
 
     // Entity -> DTO 변환
-    private BoardResponseDto convertToDto(Board board) {
+    private BoardResponseDto convertBoardToDto(Board board) {
         return BoardResponseDto.builder()
                 .id(board.getId())
                 .title(board.getTitle())
                 .description(board.getDescription())
+                .commentsCount(board.getComments().size())
                 .view(board.getView())
                 .userId(board.getUser().getUserId())        // 여기서 유저의 정보를 같이 가져오면 되지 않나? (여기서 getUser().getUsername()을 하면 유저 네임이 DTO에 담김)
                 .createdAt(board.getCreatedAt())
                 .updatedAt(board.getUpdatedAt())
+                .build();
+    }
+
+    private CommentResponseDto convertCommentToDto(Comment comment) {
+        return CommentResponseDto.builder()
+                .id(comment.getId())
+                .content(comment.getContent())
+                .createdAt(comment.getCreatedAt())
+                .userId(comment.getUser().getUserId())
                 .build();
     }
 }
